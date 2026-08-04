@@ -259,3 +259,20 @@ require_type_annotated_api_methods = True
 # List of apps whose translatable strings should be excluded from this app's translations.
 # ignore_translatable_strings_from = []
 
+doctype_js = {
+    "Requests": "public/js/requests.js",
+}
+fixtures = [
+    {
+        "doctype": "Workflow",
+        "filters": [
+            ["name", "=", "Approval Engine"]
+        ]
+    },
+        {
+        "doctype": "Workspace",
+        "filters": [
+            ["name", "=", "Request Center"]
+        ]
+    }
+]

@@ -1,0 +1,187 @@
+{
+ "actions": [],
+ "allow_bulk_edit": 1,
+ "allow_rename": 1,
+ "autoname": "REQ-.YYYY.-.#####",
+ "creation": "2026-07-31 19:17:57.182554",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "request_type_info_section",
+  "request_type",
+  "department_manager",
+  "department",
+  "column_break_fbnd",
+  "requested_by",
+  "request_date",
+  "section_break_hnux",
+  "description",
+  "section_break_tbxk",
+  "requirements",
+  "section_break_fhpv",
+  "status",
+  "amended_from",
+  "section_break_rxck",
+  "execution_doctype",
+  "execution_docname",
+  "section_break_ddft",
+  "reject_reason"
+ ],
+ "fields": [
+  {
+   "description": "Selected request",
+   "fieldname": "request_type",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Request Type",
+   "options": "Request Type",
+   "reqd": 1
+  },
+  {
+   "description": "Fetched",
+   "fetch_from": "request_type.department",
+   "fieldname": "department",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Department",
+   "options": "Department",
+   "reqd": 1
+  },
+  {
+   "description": "Fetched",
+   "fetch_from": "request_type.department_manager",
+   "fieldname": "department_manager",
+   "fieldtype": "Link",
+   "label": "Department Manager",
+   "options": "User"
+  },
+  {
+   "default": "user",
+   "description": "Current user",
+   "fieldname": "requested_by",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Requested By",
+   "options": "User",
+   "reqd": 1
+  },
+  {
+   "default": "Now",
+   "description": "Now",
+   "fieldname": "request_date",
+   "fieldtype": "Datetime",
+   "in_list_view": 1,
+   "label": "Request Date",
+   "reqd": 1
+  },
+  {
+   "description": "Explanation",
+   "fieldname": "description",
+   "fieldtype": "Text Editor",
+   "label": "Description"
+  },
+  {
+   "description": "Dynamic values",
+   "fieldname": "requirements",
+   "fieldtype": "Table",
+   "label": "Requirements",
+   "options": "Request Requirement Value"
+  },
+  {
+   "description": "Workflow",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Status",
+   "options": "Draft\nPending Manager\nPending Department\nApproved\nIn Progress\nCompleted\nRejected",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Requests",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "description": "Please explain why you are rejecting this request",
+   "fieldname": "reject_reason",
+   "fieldtype": "Text",
+   "label": "Reject Reason"
+  },
+  {
+   "description": "Target document type for execution",
+   "fieldname": "execution_doctype",
+   "fieldtype": "Data",
+   "label": "Execution DocType"
+  },
+  {
+   "description": "Generated document reference",
+   "fieldname": "execution_docname",
+   "fieldtype": "Data",
+   "label": "Execution DocName"
+  },
+  {
+   "fieldname": "request_type_info_section",
+   "fieldtype": "Section Break",
+   "label": "Request Type Info"
+  },
+  {
+   "fieldname": "column_break_fbnd",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_hnux",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "section_break_tbxk",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "section_break_fhpv",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "section_break_rxck",
+   "fieldtype": "Section Break",
+   "label": "Execution Output"
+  },
+  {
+   "fieldname": "section_break_ddft",
+   "fieldtype": "Section Break"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-08-04 19:44:04.945320",
+ "modified_by": "Administrator",
+ "module": "Request Center",
+ "name": "Requests",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}
