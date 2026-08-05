@@ -68,8 +68,6 @@ frappe.ui.form.on('Requests', {
             return;
         }
 
-        // Remember what the user already typed in, keyed by field_key,
-        // so switching (or re-triggering) request_type doesn't wipe it.
         const existing_values = {};
         (frm.doc.requirements || []).forEach(row => {
             if (row.field_key) {
@@ -93,7 +91,6 @@ frappe.ui.form.on('Requests', {
                         row.is_mandatory = src.mandatory;
                         row.sort_order = src.sort_order;
 
-                        // Restore whatever the user had entered for this key before.
                         if (src.field_key in existing_values) {
                             row.value = existing_values[src.field_key];
                         }
@@ -113,7 +110,6 @@ frappe.ui.form.on('Requests', {
 // =============================================================================
 frappe.ui.form.on("Request Requirement Value", {
 
-    // Re-render the Value widget whenever the field's type/options change
     field_type: function (frm, cdt, cdn) {
         update_value_widget(frm, cdt, cdn);
     },
@@ -130,8 +126,6 @@ frappe.ui.form.on("Request Requirement Value", {
         update_value_widget(frm, cdt, cdn);
     },
 
-    // Client-side sanity check the moment the user leaves the Value cell,
-    // so bad Link values get flagged immediately instead of only at save.
     value: function (frm, cdt, cdn) {
         const row = locals[cdt][cdn];
         if (!row || row.field_type !== "Link" || !row.value || !row.field_options) return;
@@ -152,7 +146,6 @@ frappe.ui.form.on("Request Requirement Value", {
 // HELPERS
 // =============================================================================
 
-// Refresh all rows
 function refresh_all_requirement_rows(frm) {
     if (!frm.fields_dict.requirements) return;
 
@@ -164,8 +157,7 @@ function refresh_all_requirement_rows(frm) {
 }
 
 
-// Dynamic field type switcher — makes the Value cell render as the correct
-// widget (Link picker, Date picker, Check box, etc.) based on field_type.
+
 function update_value_widget(frm, cdt, cdn) {
 
     const row = locals[cdt][cdn];

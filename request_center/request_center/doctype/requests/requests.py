@@ -1,9 +1,7 @@
 from __future__ import unicode_literals
-import re
 import frappe
 from frappe.model.document import Document
 from frappe import _
-from frappe.utils import getdate, get_datetime
 from datetime import datetime
 from typing import Optional, Dict, List, Any
 
@@ -35,16 +33,10 @@ class Requests(Document):
         status: DF.Literal["Draft", "Pending Manager", "Pending Department", "Approved", "In Progress", "Completed", "Rejected"]
     # end: auto-generated types
 
-    # -------------------------------------------------------------------------
-    # Validation entry point
-    # -------------------------------------------------------------------------
     def validate(self) -> None:
         self._sync_requirements_from_request_type()
         self._validate_mandatory_values()
 
-    # -------------------------------------------------------------------------
-    # Requirements table sync (pulled from the linked Request Type)
-    # -------------------------------------------------------------------------
     def _sync_requirements_from_request_type(self) -> bool:
         if not self.request_type:
             self.set("requirements", [])
@@ -58,7 +50,6 @@ class Requests(Document):
 
         rt_doc = frappe.get_doc("Request Type", self.request_type)
 
-        # Preserve any values already entered before we rebuild the table
         existing_values = {
             row.field_key: row.value
             for row in (self.requirements or [])
@@ -69,20 +60,17 @@ class Requests(Document):
 
         for src in (rt_doc.requirements or []):
             row = self.append("requirements", {})
-            row.field_label  = src.field_label
-            row.field_key    = src.field_key
-            row.field_type   = src.field_type
+            row.field_label = src.field_label
+            row.field_key = src.field_key
+            row.field_type = src.field_type
             row.field_options = getattr(src, "field_options", None)
             row.is_mandatory = src.mandatory
-            row.sort_order   = src.sort_order
+            row.sort_order = src.sort_order
             if src.field_key in existing_values:
                 row.value = existing_values[src.field_key]
 
         return True
 
-    # -------------------------------------------------------------------------
-    # Mandatory-field validation
-    # -------------------------------------------------------------------------
     def _validate_mandatory_values(self) -> None:
         missing: List[str] = []
 
@@ -96,8 +84,7 @@ class Requests(Document):
 
         if missing:
             frappe.throw(
-                _("Please fill a value for mandatory field(s): {0}")
-                  .format(", ".join(missing)),
+                _("Please fill a value for mandatory field(s): {0}").format(", ".join(missing)),
                 title=_("Missing Mandatory Value")
             )
 
@@ -106,7 +93,6 @@ class Requests(Document):
 # HELPER: Role lookup
 # =============================================================================
 def get_users_with_role(role_name: str) -> List[str]:
-
     users: List[str] = []
 
     try:
@@ -129,7 +115,6 @@ def get_users_with_role(role_name: str) -> List[str]:
 # =============================================================================
 @frappe.whitelist()
 def get_approvers(request_name: str) -> Dict[int, List[str]]:
-
     doc = frappe.get_doc("Requests", request_name)
 
     if not doc.request_type:
@@ -169,25 +154,22 @@ def get_approvers(request_name: str) -> Dict[int, List[str]]:
     return approvers
 
 
-# -----------------------------------------------------------------------------
-# Helper: approval matrix criteria matching
-# -----------------------------------------------------------------------------
+# =============================================================================
+# HELPER: approval matrix criteria matching
+# =============================================================================
 def _matches_criteria(doc: Document, based_on: str, criteria: Optional[str]) -> bool:
-
     if not criteria:
         return True
 
     if based_on == "Department":
         return doc.department == criteria
-
     elif based_on == "Request Type":
         return doc.request_type == criteria
-
     elif based_on == "Amount":
         try:
             amount = float(getattr(doc, "amount", 0) or 0)
             return amount >= float(criteria or 0)
-        except:
+        except (ValueError, TypeError):
             return False
 
     return False
@@ -198,7 +180,6 @@ def _matches_criteria(doc: Document, based_on: str, criteria: Optional[str]) -> 
 # =============================================================================
 @frappe.whitelist()
 def execute_request(request_name: str) -> Dict[str, Any]:
-
     doc = frappe.get_doc("Requests", request_name)
 
     if doc.status != "Approved":
@@ -209,7 +190,7 @@ def execute_request(request_name: str) -> Dict[str, Any]:
 
     req_type = frappe.get_doc("Request Type", doc.request_type)
 
-    if not req_type.execution_mode:
+    if not getattr(req_type, "execution_mode", None):
         frappe.throw(_("Execution Mode not set for this Request Type"))
 
     mapping = frappe.get_all(
@@ -254,11 +235,10 @@ def execute_request(request_name: str) -> Dict[str, Any]:
         frappe.throw(_("Error creating document: {0}").format(str(e)))
 
 
-# -----------------------------------------------------------------------------
-# Helper: build the mapped target document
-# -----------------------------------------------------------------------------
-def create_target_document(req_doc, target_doctype, mapping_doc):
-
+# =============================================================================
+# HELPER: build the mapped target document
+# =============================================================================
+def create_target_document(req_doc: Document, target_doctype: str, mapping_doc: Any) -> Document:
     new_doc = frappe.new_doc(target_doctype)
 
     mapping_details = mapping_doc.field_mapping or []
@@ -268,10 +248,7 @@ def create_target_document(req_doc, target_doctype, mapping_doc):
         target_field = mapping.target_field
         field_value = mapping.field_value
 
-        if source_field:
-            value = req_doc.get(source_field)
-        else:
-            value = field_value
+        value = req_doc.get(source_field) if source_field else field_value
 
         if target_field:
             new_doc.set(target_field, value)
@@ -285,7 +262,6 @@ def create_target_document(req_doc, target_doctype, mapping_doc):
 # =============================================================================
 @frappe.whitelist()
 def get_execution_status(request_name: str) -> Dict[str, Any]:
-
     doc = frappe.get_doc("Requests", request_name)
 
     return {
@@ -298,7 +274,6 @@ def get_execution_status(request_name: str) -> Dict[str, Any]:
 @frappe.whitelist()
 def get_request(request_name: str) -> Dict[str, Any]:
     doc = frappe.get_doc("Requests", request_name)
-
     return doc.as_dict()
 
 
@@ -306,19 +281,14 @@ def get_request(request_name: str) -> Dict[str, Any]:
 # WHITELISTED API: Approve / Reject
 # =============================================================================
 @frappe.whitelist()
-def approve_request(request_name: str, comment: Optional[str] = None) -> Dict[str, Any]:
-
+def approve_request(request_name: str) -> Dict[str, Any]:
     doc = frappe.get_doc("Requests", request_name)
     doc.reload()
 
     approvers = get_approvers(request_name)
     current_user = frappe.session.user
 
-    is_approver = False
-    for level in approvers.values():
-        if current_user in level:
-            is_approver = True
-            break
+    is_approver = any(current_user in level for level in approvers.values())
 
     if not is_approver:
         frappe.throw(_("You are not authorized to approve this request"))
@@ -341,38 +311,29 @@ def approve_request(request_name: str, comment: Optional[str] = None) -> Dict[st
 
 
 @frappe.whitelist()
-def reject_request(request_name: str, reason: Optional[str] = None) -> Dict[str, Any]:
-
+def reject_request(request_name: str, reason: str) -> Dict[str, Any]:
     doc = frappe.get_doc("Requests", request_name)
+    doc.reload()
 
     approvers = get_approvers(request_name)
     current_user = frappe.session.user
 
-    is_approver = False
-    for level in approvers.values():
-        if current_user in level:
-            is_approver = True
-            break
+    all_approvers = [user for level in approvers.values() for user in level]
 
-    if not is_approver:
+    if current_user not in all_approvers and current_user != "Administrator":
         frappe.throw(_("You are not authorized to reject this request"))
 
+    doc.reject_reason = reason
     doc.status = "Rejected"
 
-    if reason:
-        doc.reject_reason = reason
-
     doc.save()
-
-    frappe.msgprint(_("Request rejected"))
+    frappe.msgprint(_("Request rejected successfully"))
 
     return {
         'status': 'success',
         'message': f'Request {doc.name} rejected',
-        'reason': reason,
-        'new_status': doc.status
+        'reason': reason
     }
-
 
 # =============================================================================
 # WHITELISTED API: Create / Complete
@@ -380,32 +341,20 @@ def reject_request(request_name: str, reason: Optional[str] = None) -> Dict[str,
 @frappe.whitelist()
 def create_request(
     request_type: str,
-    department: str,
     naming_series: Optional[str] = None,
     requested_by: Optional[str] = None,
     request_date: Optional[str] = None,
     description: Optional[str] = None,
+    requirements_data: Optional[dict] = None, 
     **kwargs
 ) -> Dict[str, Any]:
 
     try:
         new_doc = frappe.new_doc("Requests")
 
-        if naming_series:
-            new_doc.naming_series = naming_series
-
         new_doc.request_type = request_type
-        new_doc.department = department
-
-        if requested_by:
-            new_doc.requested_by = requested_by
-        else:
-            new_doc.requested_by = frappe.session.user
-
-        if request_date:
-            new_doc.request_date = request_date
-        else:
-            new_doc.request_date = datetime.now()
+        new_doc.requested_by = requested_by or frappe.session.user
+        new_doc.request_date = request_date or datetime.now()
 
         if description:
             new_doc.description = description
@@ -413,6 +362,20 @@ def create_request(
         for key, value in kwargs.items():
             if hasattr(new_doc, key):
                 new_doc.set(key, value)
+
+        if requirements_data:
+            rt_doc = frappe.get_doc("Request Type", request_type)
+
+            for req in rt_doc.requirements:
+                row = new_doc.append("requirements", {})
+                row.field_label = req.field_label
+                row.field_key = req.field_key
+                row.field_type = req.field_type
+                row.is_mandatory = req.mandatory
+                row.sort_order = req.sort_order
+
+                if req.field_key in requirements_data:
+                    row.value = requirements_data.get(req.field_key)
 
         new_doc.save()
         frappe.msgprint(_("Request created successfully"))
@@ -422,6 +385,7 @@ def create_request(
             'message': f'Request {new_doc.name} created successfully',
             'request_name': new_doc.name
         }
+
     except Exception as e:
         frappe.log_error(f"Error creating request: {str(e)}")
         frappe.throw(_("Error creating request: {0}").format(str(e)))
@@ -429,7 +393,6 @@ def create_request(
 
 @frappe.whitelist()
 def complete_request(request_name: str) -> Dict[str, Any]:
-
     doc = frappe.get_doc("Requests", request_name)
 
     if doc.status != "In Progress":
@@ -437,7 +400,6 @@ def complete_request(request_name: str) -> Dict[str, Any]:
 
     doc.status = "Completed"
     doc.save()
-
     frappe.msgprint(_("Request completed successfully"))
 
     return {
