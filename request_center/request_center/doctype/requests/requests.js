@@ -124,20 +124,6 @@ frappe.ui.form.on("Request Requirement Value", {
 
     requirements_add: function (frm, cdt, cdn) {
         update_value_widget(frm, cdt, cdn);
-    },
-
-    value: function (frm, cdt, cdn) {
-        const row = locals[cdt][cdn];
-        if (!row || row.field_type !== "Link" || !row.value || !row.field_options) return;
-
-        frappe.db.exists(row.field_options, row.value).then(exists => {
-            if (!exists) {
-                frappe.show_alert({
-                    message: __('"{0}" is not a valid {1}', [row.value, row.field_options]),
-                    indicator: 'red'
-                });
-            }
-        });
     }
 });
 
@@ -179,30 +165,37 @@ function update_value_widget(frm, cdt, cdn) {
 
         case "Datetime":
             df.fieldtype = "Datetime";
+            df.options = "";
             break;
 
         case "Check":
             df.fieldtype = "Check";
+            df.options = "";
             break;
 
         case "Int":
             df.fieldtype = "Int";
+            df.options = "";
             break;
 
         case "Float":
             df.fieldtype = "Float";
+            df.options = "";
             break;
 
         case "Currency":
             df.fieldtype = "Currency";
+            df.options = "";
             break;
 
         case "Text":
             df.fieldtype = "Text";
+            df.options = "";
             break;
 
         default:
             df.fieldtype = "Data";
+            df.options = "";
     }
 
     grid_row.refresh_field("value");
