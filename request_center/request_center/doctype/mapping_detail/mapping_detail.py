@@ -19,7 +19,7 @@ class MappingDetail(Document):
 		parent: DF.Data
 		parentfield: DF.Data
 		parenttype: DF.Data
-		source_field: DF.Data
+		source_field: DF.Data | None
 		target_field: DF.Data
 	# end: auto-generated types
 

@@ -17,8 +17,7 @@
    "fieldname": "source_field",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "Source Field",
-   "reqd": 1
+   "label": "Source Field"
   },
   {
    "fieldname": "target_field",
@@ -43,7 +42,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2026-08-01 19:40:59.188146",
+ "modified": "2026-08-06 17:06:01.867037",
  "modified_by": "Administrator",
  "module": "Request Center",
  "name": "Mapping Detail",
