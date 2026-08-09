@@ -11,7 +11,7 @@ frappe.ui.form.on('Requests', {
 
         frm.add_custom_button(__('View Approvers'), function () {
             frappe.call({
-                method: 'request_center.request_center.doctype.requests.requests.get_approvers',
+                method: 'request_center.api.requests.get_approvers',
                 args: { request_name: frm.doc.name },
                 callback: function (r) {
                     if (r.message) {
@@ -44,7 +44,7 @@ frappe.ui.form.on('Requests', {
             frm.add_custom_button(__('Execute'), function () {
                 frappe.confirm('Are you sure?', function () {
                     frappe.call({
-                        method: 'request_center.request_center.doctype.requests.requests.execute_request',
+                        method: 'request_center.api.requests.execute_request',
                         args: { request_name: frm.doc.name },
                         callback: function (r) {
                             if (r.message) {
