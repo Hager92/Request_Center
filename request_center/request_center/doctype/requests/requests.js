@@ -59,6 +59,25 @@ frappe.ui.form.on('Requests', {
     },
 
     // -------------------------------------------------------------------------
+    // Validate: block save client-side if any mandatory requirement is empty
+    // -------------------------------------------------------------------------
+    validate: function (frm) {
+        const missing = [];
+
+        (frm.doc.requirements || []).forEach(row => {
+            if (cint(row.is_mandatory) && !row.value) {
+                missing.push(row.field_label || row.field_key || 'Unknown Field');
+            }
+        });
+
+        if (missing.length) {
+            frappe.throw(
+                __('Please fill a value for mandatory field(s): {0}', [missing.join(', ')])
+            );
+        }
+    },
+
+    // -------------------------------------------------------------------------
     // Request Type change: rebuild the requirements table 
     // -------------------------------------------------------------------------
     request_type: function (frm) {
@@ -155,6 +174,8 @@ function update_value_widget(frm, cdt, cdn) {
 
     const df = grid_row.docfields.find(d => d.fieldname === "value");
     if (!df) return;
+
+    df.reqd = cint(row.is_mandatory);
 
     switch (row.field_type) {
 

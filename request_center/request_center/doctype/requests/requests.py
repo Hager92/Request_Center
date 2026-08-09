@@ -3,6 +3,7 @@ import frappe
 from frappe.model.document import Document
 from frappe import _
 from typing import List
+from frappe.utils import getdate, get_datetime
 
 
 # =============================================================================
@@ -38,6 +39,7 @@ class Requests(Document):
     def validate(self) -> None:
         self._sync_requirements_from_request_type()
         self._validate_mandatory_values()
+        self._validate_requirement_types()
 
     # -------------------------------------------------------------------------
     # Request Type sync: rebuild requirements table if changed
@@ -95,4 +97,38 @@ class Requests(Document):
                 _("Please fill a value for mandatory field(s): {0}").format(", ".join(missing)),
                 title=_("Missing Mandatory Value")
             )
-            
+
+    # -------------------------------------------------------------------------
+    # Requirement Type validation: ensure values match their types
+    # -------------------------------------------------------------------------
+    def _validate_requirement_types(self) -> None:
+        errors: List[str] = []
+
+        for row in self.requirements:
+            value = getattr(row, "value", None)
+            if value in (None, ""):
+                continue
+
+            field_type = getattr(row, "field_type", None)
+            field_label = getattr(row, "field_label", None) or getattr(row, "field_key", "Unknown Field")
+
+            try:
+                if field_type == "Date":
+                    getdate(value)
+                elif field_type == "Datetime":
+                    get_datetime(value)
+                elif field_type == "Int":
+                    int(str(value).strip())
+                elif field_type in ("Float", "Currency"):
+                    float(str(value).strip())
+                elif field_type == "Check":
+                    if str(value).strip().lower() not in ("0", "1", "true", "false"):
+                        raise ValueError
+            except (ValueError, TypeError):
+                errors.append(_("'{0}' is not a valid {1} for field '{2}'").format(value, field_type, field_label))
+
+        if errors:
+            frappe.throw(
+                "<br>".join(errors),
+                title=_("Invalid Field Value")
+            )

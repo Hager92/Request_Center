@@ -4,8 +4,6 @@ from frappe.model.document import Document
 from frappe import _
 from datetime import datetime
 from typing import Optional, Dict, List, Any
-from frappe.utils import getdate, get_datetime
-
 
 # =============================================================================
 # HELPER: Role lookup
@@ -153,65 +151,6 @@ def execute_request(request_name: str) -> Dict[str, Any]:
     except Exception as e:
         frappe.log_error(f"Error executing request {request_name}: {str(e)}")
         frappe.throw(_("Error creating document: {0}").format(str(e)))
-
-
-# =============================================================================
-# HELPER: mandatory requirement value validation
-# =============================================================================
-def _validate_requirements(doc: Document) -> None:
-    missing: List[str] = []
-
-    for row in (doc.requirements or []):
-        is_mandatory = getattr(row, "is_mandatory", 0)
-        value = getattr(row, "value", None)
-
-        if is_mandatory and not value:
-            field_label = getattr(row, "field_label", None) or getattr(row, "field_key", "Unknown Field")
-            missing.append(field_label)
-
-    if missing:
-        frappe.throw(
-            _("Please fill a value for mandatory field(s): {0}").format(", ".join(missing)),
-            title=_("Missing Mandatory Value")
-        )
-
-
-# =============================================================================
-# HELPER: requirement value TYPE validation
-# =============================================================================
-def _validate_requirement_types(doc: Document) -> None:
-
-    errors: List[str] = []
-
-    for row in (doc.requirements or []):
-        value = getattr(row, "value", None)
-        if value in (None, ""):
-            continue
-
-        field_type = getattr(row, "field_type", None)
-        field_label = getattr(row, "field_label", None) or getattr(row, "field_key", "Unknown Field")
-
-        try:
-            if field_type == "Date":
-                getdate(value)
-            elif field_type == "Datetime":
-                get_datetime(value)
-            elif field_type == "Int":
-                int(str(value).strip())
-            elif field_type in ("Float", "Currency"):
-                float(str(value).strip())
-            elif field_type == "Check":
-                if str(value).strip().lower() not in ("0", "1", "true", "false"):
-                    raise ValueError
-        except (ValueError, TypeError):
-            errors.append(_("'{0}' is not a valid {1} for field '{2}'").format(value, field_type, field_label))
-
-    if errors:
-        frappe.throw(
-            "<br>".join(errors),
-            title=_("Invalid Field Value")
-        )
-
 
 # =============================================================================
 # HELPER: normalize requirements input (accepts list-of-rows or dict form)
@@ -365,6 +304,16 @@ def create_request(
 
         if values_by_key:
             rt_doc = frappe.get_doc("Request Type", request_type)
+            valid_keys = {req.field_key for req in (rt_doc.requirements or [])}
+
+            unknown_keys = [k for k in values_by_key if k not in valid_keys]
+            if unknown_keys:
+                frappe.throw(
+                    _("Unknown requirement field(s) for request type '{0}': {1}").format(
+                        request_type, ", ".join(unknown_keys)
+                    ),
+                    title=_("Invalid Field Key")
+                )
 
             for req in rt_doc.requirements:
                 row = new_doc.append("requirements", {})
@@ -376,9 +325,6 @@ def create_request(
 
                 if req.field_key in values_by_key:
                     row.value = values_by_key.get(req.field_key)
-
-        _validate_requirements(new_doc)
-        _validate_requirement_types(new_doc)
 
         new_doc.save()
         frappe.msgprint(_("Request created successfully"))
@@ -428,8 +374,7 @@ def update_request(
                 frappe.throw(_("Unknown requirement field: {0}").format(field_key))
 
     try:
-        _validate_requirements(doc)
-        _validate_requirement_types(doc)
+
         doc.save()
     except frappe.ValidationError:
         raise
