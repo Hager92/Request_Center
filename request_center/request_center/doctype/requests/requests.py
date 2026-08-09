@@ -63,6 +63,9 @@ class Requests(Document):
             if getattr(row, "field_key", None)
         }
 
+        pending_values = getattr(self, "_pending_requirement_values", None) or {}
+        existing_values.update(pending_values)
+
         self.set("requirements", [])
 
         for src in (rt_doc.requirements or []):

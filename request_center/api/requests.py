@@ -315,18 +315,9 @@ def create_request(
                     title=_("Invalid Field Key")
                 )
 
-            for req in rt_doc.requirements:
-                row = new_doc.append("requirements", {})
-                row.field_label = req.field_label
-                row.field_key = req.field_key
-                row.field_type = req.field_type
-                row.is_mandatory = req.mandatory
-                row.sort_order = req.sort_order
+            new_doc._pending_requirement_values = values_by_key
 
-                if req.field_key in values_by_key:
-                    row.value = values_by_key.get(req.field_key)
-
-        new_doc.save()
+        new_doc.save()  
         frappe.msgprint(_("Request created successfully"))
 
         return {
