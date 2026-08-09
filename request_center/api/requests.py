@@ -4,6 +4,7 @@ from frappe.model.document import Document
 from frappe import _
 from datetime import datetime
 from typing import Optional, Dict, List, Any
+from frappe.utils import strip_html
 
 # =============================================================================
 # HELPER: Role lookup
@@ -109,19 +110,21 @@ def execute_request(request_name: str) -> Dict[str, Any]:
     if not getattr(req_type, "execution_mode", None):
         frappe.throw(_("Execution Mode not set for this Request Type"))
 
-    mapping = frappe.get_all(
+    mapping_names = frappe.get_all(
         "Document Mapping",
         filters={
             "request_type": doc.request_type,
             "execution_mode": req_type.execution_mode
         },
-        fields=["*"]
+        pluck="name",
+        order_by="modified desc",
+        limit_page_length=1
     )
 
-    if not mapping:
+    if not mapping_names:
         frappe.throw(_("No Document Mapping found for this Request Type and Execution Mode"))
 
-    mapping_doc = mapping[0]
+    mapping_doc = frappe.get_doc("Document Mapping", mapping_names[0])
     target_doctype = mapping_doc.get("target_doctype")
 
     if not target_doctype:
@@ -175,6 +178,8 @@ def _normalize_requirements_input(requirements: Any = None, requirements_data: A
 # =============================================================================
 def create_target_document(req_doc: Document, target_doctype: str, mapping_doc: Any) -> Document:
     new_doc = frappe.new_doc(target_doctype)
+    req_meta = req_doc.meta
+    target_meta = frappe.get_meta(target_doctype)
 
     mapping_details = mapping_doc.field_mapping or []
 
@@ -183,7 +188,18 @@ def create_target_document(req_doc: Document, target_doctype: str, mapping_doc: 
         target_field = mapping.target_field
         field_value = mapping.field_value
 
+        if source_field and not req_meta.has_field(source_field):
+            frappe.throw(_("Invalid source field '{0}' on {1} — check Document Mapping").format(
+                source_field, req_doc.doctype))
+
+        if target_field and not target_meta.has_field(target_field):
+            frappe.throw(_("Invalid target field '{0}' on {1} — check Document Mapping").format(
+                target_field, target_doctype))
+
         value = req_doc.get(source_field) if source_field else field_value
+
+        if isinstance(value, str):
+            value = strip_html(value)
 
         if target_field:
             new_doc.set(target_field, value)
