@@ -84,8 +84,15 @@ def _matches_criteria(doc: Document, based_on: str, criteria: Optional[str]) -> 
         return doc.request_type == criteria
     elif based_on == "Amount":
         try:
-            amount = float(getattr(doc, "amount", 0) or 0)
+            amount = 0
+
+            for row in getattr(doc, "requirements", []):  # <-- your table fieldname
+                if row.field_key == "amount":
+                    amount = float(row.value or 0)
+                    break  # stop after finding it
+
             return amount >= float(criteria or 0)
+
         except (ValueError, TypeError):
             return False
 
