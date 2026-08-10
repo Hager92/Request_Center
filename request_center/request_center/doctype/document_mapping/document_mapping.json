@@ -2,6 +2,7 @@
  "actions": [],
  "allow_bulk_edit": 1,
  "allow_rename": 1,
+ "autoname": "Doc.####",
  "creation": "2026-08-01 19:41:33.202888",
  "doctype": "DocType",
  "engine": "InnoDB",
@@ -44,10 +45,11 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-08-01 19:43:36.537057",
+ "modified": "2026-08-10 13:08:18.164159",
  "modified_by": "Administrator",
  "module": "Request Center",
  "name": "Document Mapping",
+ "naming_rule": "Expression",
  "owner": "Administrator",
  "permissions": [
   {
