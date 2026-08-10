@@ -14,7 +14,7 @@ class ApprovalMatrixLevel(Document):
 	if TYPE_CHECKING:
 		from frappe.types import DF
 
-		approver_role: DF.Link
+		approver_role: DF.Link | None
 		based_on: DF.Literal["Department", "Request Type", "Amount"]
 		criteria: DF.Data | None
 		fallback_role: DF.Link | None
