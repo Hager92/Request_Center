@@ -86,10 +86,10 @@ def _matches_criteria(doc: Document, based_on: str, criteria: Optional[str]) -> 
         try:
             amount = 0
 
-            for row in getattr(doc, "requirements", []):  # <-- your table fieldname
+            for row in getattr(doc, "requirements", []):  
                 if row.field_key == "amount":
                     amount = float(row.value or 0)
-                    break  # stop after finding it
+                    break  
 
             return amount >= float(criteria or 0)
 
