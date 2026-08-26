@@ -2,6 +2,23 @@
 // For license information, please see license.txt
 
 frappe.ui.form.on("Tender", {
+	after_save(frm) {
+		if (!frm.doc.request) {
+			return;
+		}
+		frappe.call({
+			method: "request_center.tender.sync_request_suppliers",
+			args: { tender_name: frm.doc.name },
+			callback: function (r) {
+				if (r.message && r.message.copied) {
+					frappe.show_alert({
+						message: __("{0} supplier(s) copied to Request {1}", [r.message.copied, frm.doc.request]),
+						indicator: "green",
+					});
+				}
+			},
+		});
+	},
 	refresh(frm) {
 		if (frm.doc.request) {
 			frm.add_custom_button(__("Open Request"), function () {
@@ -12,23 +29,6 @@ frappe.ui.form.on("Tender", {
 			frm.add_custom_button(__("Open Material Request"), function () {
 				frappe.set_route("Form", "Material Request", frm.doc.material_request);
 			});
-		}
-		if (!frm.is_new() && frm.doc.request && !(frm.doc.rfqs || []).some((row) => row.request_for_quotation)) {
-			frm.add_custom_button(__("Create and Send RFQ"), function () {
-				frappe.confirm(__("Create and send an RFQ to the suppliers selected on this Tender?"), function () {
-					frappe.call({
-						method: "request_center.rfq.create_and_send_rfq",
-						args: { request_name: frm.doc.request },
-						freeze: true,
-						callback: function (r) {
-							if (r.message) {
-								frappe.msgprint(r.message.message);
-								frm.reload_doc();
-							}
-						},
-					});
-				});
-			}).addClass("btn-primary");
 		}
 		if (!frm.is_new()) {
 			frm.add_custom_button(__("Refresh Offers"), function () {

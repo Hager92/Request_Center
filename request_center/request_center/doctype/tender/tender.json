@@ -128,12 +128,11 @@
    "label": "Selected Suppliers"
   },
   {
-   "description": "Suppliers invited to offer on this tender",
+   "description": "Add suppliers here and Save. They are copied onto the Request.",
    "fieldname": "suppliers",
    "fieldtype": "Table",
    "label": "Selected Suppliers",
-   "options": "Tender Supplier",
-   "reqd": 1
+   "options": "Tender Supplier"
   },
   {
    "fieldname": "section_offers",
@@ -223,7 +222,7 @@
    "link_fieldname": "request_center_tender"
   }
  ],
- "modified": "2026-08-25 14:20:00.000000",
+ "modified": "2026-08-26 17:45:00.000000",
  "modified_by": "Administrator",
  "module": "Request Center",
  "name": "Tender",

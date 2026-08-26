@@ -241,6 +241,10 @@ def create_and_send_rfq_for_request(request_doc) -> Dict[str, Any]:
 	tender, suppliers = _tender_and_suppliers(request_doc)
 	if not suppliers:
 		frappe.throw(_("Select suppliers on the Tender before creating an RFQ"))
+	if tender:
+		from request_center.tender import copy_suppliers_to_request
+
+		copy_suppliers_to_request(tender)
 
 	existing = _existing_rfq(request_doc)
 	if existing:

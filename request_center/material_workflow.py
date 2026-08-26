@@ -474,6 +474,7 @@ def get_material_workflow_action(request_name: str) -> Dict[str, Any]:
 		"can_act": can_act and bool(stages),
 		"stages": stages,
 		"fulfillment_stage": getattr(doc, "fulfillment_stage", None),
+		"tender": getattr(doc, "tender", None),
 		"suppliers_editable": can_act and _status_of(doc, STAGE_SUPPLIER_SELECTION) == "Current",
 	}
 
@@ -538,6 +539,8 @@ def advance_material_workflow(
 		"message": message,
 		"fulfillment_stage": doc.fulfillment_stage,
 		"new_status": doc.status,
+		"tender": getattr(doc, "tender", None),
+		"rfq": getattr(doc, "rfq", None),
 	}
 
 
@@ -603,20 +606,11 @@ def _advance_purchase(doc) -> str:
 		_submit_if_draft("Material Request", name)
 	_set_step(doc, STAGE_PURCHASE, "Done", remarks=_("Purchase path started"))
 	_set_step(doc, STAGE_SUPPLIER_SELECTION, "Current")
-	return _("Purchase started. Select suppliers.")
+	return _("Purchase started. Create the Tender, add suppliers there, then send the RFQ from this request.")
 
 
 def _advance_supplier_selection(doc) -> str:
-	suppliers = [row.supplier for row in (doc.material_suppliers or []) if row.supplier]
-	if not suppliers:
-		frappe.throw(_("Add at least one supplier before leaving Supplier Selection"))
-	_set_step(
-		doc,
-		STAGE_SUPPLIER_SELECTION,
-		"Done",
-		remarks=_("Suppliers: {0}").format(", ".join(suppliers)),
-	)
-	from request_center.tender import ensure_tender_for_request
+	from request_center.tender import copy_suppliers_to_request, ensure_tender_for_request
 
 	tender = ensure_tender_for_request(
 		doc,
@@ -624,9 +618,23 @@ def _advance_supplier_selection(doc) -> str:
 		external_reference=getattr(doc, "tender_reference", None),
 	)
 	doc.tender = tender.name
+	copy_suppliers_to_request(tender)
+	doc.reload()
+	suppliers = [row.supplier for row in (doc.material_suppliers or []) if row.supplier]
+	if not suppliers:
+		suppliers = [row.supplier for row in (tender.suppliers or []) if row.supplier]
+		for supplier in suppliers:
+			doc.append("material_suppliers", {"supplier": supplier})
+	if suppliers:
+		remarks = _("Suppliers: {0}").format(", ".join(suppliers))
+	else:
+		remarks = _("Tender created. Add suppliers on the Tender, then Save.")
+	_set_step(doc, STAGE_SUPPLIER_SELECTION, "Done", remarks=remarks)
 	_link_document(doc, "Tender", tender.name, STAGE_TENDER, "Purchase")
 	_set_step(doc, STAGE_TENDER, "Current", "Tender", tender.name)
-	return _("Suppliers recorded. Tender {0} created.").format(tender.name)
+	return _("Tender {0} created. Add suppliers on the Tender and Save, then Complete Tender and send the RFQ from this request.").format(
+		tender.name
+	)
 
 
 def _advance_tender(doc, tender_notes: Optional[str], tender_reference: Optional[str] = None) -> str:

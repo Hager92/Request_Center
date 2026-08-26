@@ -311,11 +311,12 @@
   },
   {
    "depends_on": "eval:doc.category==\"Material Request\"",
-   "description": "Suppliers considered for the Purchase path. Required at Supplier Selection.",
+   "description": "Copied from the Tender after you add suppliers there and Save.",
    "fieldname": "material_suppliers",
    "fieldtype": "Table",
    "label": "Suppliers",
-   "options": "Request Material Supplier"
+   "options": "Request Material Supplier",
+   "read_only": 1
   },
   {
    "depends_on": "eval:doc.category==\"Material Request\"",
@@ -473,7 +474,7 @@
    "link_fieldname": "request_center_request"
   }
  ],
- "modified": "2026-08-26 10:12:56.663595",
+ "modified": "2026-08-26 18:25:00.000000",
  "modified_by": "Administrator",
  "module": "Request Center",
  "name": "Requests",

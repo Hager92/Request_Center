@@ -66,6 +66,7 @@ frappe.ui.form.on('Requests', {
         refresh_all_requirement_rows(frm);
         lock_approval_tracking_grid(frm);
         toggle_material_items(frm);
+        pull_tender_suppliers(frm);
         render_request_experience(frm);
         show_approval_status(frm);
         add_approval_actions(frm);
@@ -289,11 +290,10 @@ function toggle_material_items(frm) {
         frm.fields_dict.supplier_comparison.grid.cannot_delete_rows = true;
     }
 
-    const suppliers_open = is_material && frm.doc.fulfillment_stage === "Supplier Selection";
     if (frm.fields_dict.material_suppliers && frm.fields_dict.material_suppliers.grid) {
-        frm.fields_dict.material_suppliers.grid.cannot_add_rows = !suppliers_open;
-        frm.fields_dict.material_suppliers.grid.cannot_delete_rows = !suppliers_open;
-        frm.set_df_property("material_suppliers", "read_only", suppliers_open ? 0 : 1);
+        frm.fields_dict.material_suppliers.grid.cannot_add_rows = true;
+        frm.fields_dict.material_suppliers.grid.cannot_delete_rows = true;
+        frm.set_df_property("material_suppliers", "read_only", 1);
     }
     frm.set_df_property("tender", "read_only", 1);
     frm.set_df_property("rfq", "read_only", 1);
@@ -311,6 +311,22 @@ function toggle_material_items(frm) {
     frm.fields_dict.material_items.grid.cannot_add_rows = locked;
     frm.fields_dict.material_items.grid.cannot_delete_rows = locked;
     frm.set_df_property("material_items", "read_only", locked ? 1 : 0);
+}
+
+
+function pull_tender_suppliers(frm) {
+    if (frm.is_new() || !frm.doc.tender) {
+        return;
+    }
+    frappe.call({
+        method: "request_center.tender.sync_request_suppliers",
+        args: { tender_name: frm.doc.tender },
+        callback: function (r) {
+            if (r.message && r.message.copied) {
+                frm.reload_doc();
+            }
+        },
+    });
 }
 
 
@@ -420,18 +436,7 @@ function run_material_workflow_step(frm, step) {
     };
 
     if (step.stage === "Supplier Selection") {
-        const confirm_suppliers = function () {
-            if (!(frm.doc.material_suppliers || []).filter((row) => row.supplier).length) {
-                frappe.msgprint(__("Add at least one supplier, save, then confirm Supplier Selection."));
-                return;
-            }
-            go({});
-        };
-        if (frm.is_dirty()) {
-            frm.save().then(confirm_suppliers);
-        } else {
-            confirm_suppliers();
-        }
+        go({});
         return;
     }
 

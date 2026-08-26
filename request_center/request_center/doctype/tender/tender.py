@@ -44,8 +44,6 @@ class Tender(Document):
 	def validate(self) -> None:
 		if not self.items:
 			frappe.throw(_("Add at least one requested product to the Tender"))
-		if not self.suppliers:
-			frappe.throw(_("Add at least one supplier to the Tender"))
 		seen_items = set()
 		for row in self.items:
 			if flt(row.qty) <= 0:
@@ -55,6 +53,8 @@ class Tender(Document):
 			seen_items.add(row.item_code)
 		seen_suppliers = set()
 		for row in self.suppliers:
+			if not row.supplier:
+				continue
 			if row.supplier in seen_suppliers:
 				frappe.throw(_("Supplier {0} is selected more than once").format(row.supplier))
 			seen_suppliers.add(row.supplier)
@@ -70,3 +70,6 @@ class Tender(Document):
 			return
 		if frappe.db.get_value("Requests", self.request, "tender") != self.name:
 			frappe.db.set_value("Requests", self.request, "tender", self.name, update_modified=False)
+		from request_center.tender import copy_suppliers_to_request
+
+		copy_suppliers_to_request(self)

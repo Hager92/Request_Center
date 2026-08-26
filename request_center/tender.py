@@ -20,6 +20,7 @@ def ensure_tender_for_request(request_doc, notes: Optional[str] = None, external
 		tender.flags.ignore_permissions = True
 		tender.save()
 		_stamp_linked_material_request(tender, request_doc)
+		copy_suppliers_to_request(tender)
 		return tender
 
 	tender = frappe.new_doc("Tender")
@@ -32,6 +33,7 @@ def ensure_tender_for_request(request_doc, notes: Optional[str] = None, external
 	tender.insert(ignore_permissions=True)
 	request_doc.tender = tender.name
 	_stamp_linked_material_request(tender, request_doc)
+	copy_suppliers_to_request(tender)
 	return tender
 
 
@@ -116,6 +118,66 @@ def _sync_suppliers(tender, request_doc) -> None:
 			continue
 		tender.append("suppliers", {"supplier": row.supplier})
 		existing.add(row.supplier)
+
+
+def copy_suppliers_to_request(tender) -> int:
+	if isinstance(tender, str):
+		if not tender or not frappe.db.exists("Tender", tender):
+			return 0
+		tender = frappe.get_doc("Tender", tender)
+	request_name = getattr(tender, "request", None)
+	if not request_name or not frappe.db.exists("Requests", request_name):
+		return 0
+	if not frappe.get_meta("Requests").has_field("material_suppliers"):
+		return 0
+	suppliers = []
+	seen = set()
+	for row in tender.suppliers or []:
+		if not row.supplier or row.supplier in seen:
+			continue
+		suppliers.append(row.supplier)
+		seen.add(row.supplier)
+	if not suppliers:
+		return 0
+	existing = set(
+		frappe.get_all(
+			"Request Material Supplier",
+			filters={"parent": request_name, "parenttype": "Requests", "parentfield": "material_suppliers"},
+			pluck="supplier",
+		)
+	)
+	max_idx = frappe.db.sql(
+		"""
+		select ifnull(max(idx), 0)
+		from `tabRequest Material Supplier`
+		where parent=%s and parenttype=%s and parentfield=%s
+		""",
+		(request_name, "Requests", "material_suppliers"),
+	)[0][0]
+	added = 0
+	for supplier in suppliers:
+		if supplier in existing:
+			continue
+		max_idx += 1
+		row = frappe.new_doc("Request Material Supplier")
+		row.parent = request_name
+		row.parenttype = "Requests"
+		row.parentfield = "material_suppliers"
+		row.idx = max_idx
+		row.supplier = supplier
+		row.flags.ignore_permissions = True
+		row.db_insert()
+		existing.add(supplier)
+		added += 1
+	return added
+
+
+@frappe.whitelist()
+def sync_request_suppliers(tender_name: str) -> Dict[str, Any]:
+	if not tender_name:
+		frappe.throw(_("Tender is required"))
+	added = copy_suppliers_to_request(tender_name)
+	return {"status": "success", "copied": added}
 
 
 def _stamp_linked_material_request(tender, request_doc) -> None:
