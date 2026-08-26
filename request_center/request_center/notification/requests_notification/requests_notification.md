@@ -1,7 +1,5 @@
-<p>Hello,</p>
+Request Center sends notifications from the request workflow:
 
-<p>Request {{ doc.name }} is now in state: {{ doc.status }}</p>
+Requester — status or approval stage changed (submitted, next level, approved, rejected, completed).
 
-<p>Requested by: {{ doc.owner }}</p>
-
-<p>Thanks.</p>
+Approver — the configured employee for the current Approval Level when the request reaches that level.

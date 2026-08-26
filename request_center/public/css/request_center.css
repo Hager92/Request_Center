@@ -1,0 +1,77 @@
+.request-ux-wrap {
+	margin: 0 0 16px;
+}
+
+.request-ux-tracker {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+	gap: 10px;
+	padding: 12px 14px;
+	border: 1px solid var(--border-color);
+	border-radius: var(--border-radius-md);
+	background: var(--fg-color);
+}
+
+.request-ux-tracker__item {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	min-width: 0;
+}
+
+.request-ux-tracker__label {
+	font-size: 11px;
+	letter-spacing: 0.02em;
+	text-transform: uppercase;
+	color: var(--text-muted);
+}
+
+.request-ux-tracker__value {
+	font-size: 14px;
+	font-weight: 600;
+	color: var(--text-color);
+	word-break: break-word;
+}
+
+.request-ux-pipeline {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	margin-top: 10px;
+}
+
+.request-ux-pipeline__step {
+	display: inline-flex;
+	align-items: center;
+	padding: 4px 10px;
+	border-radius: 999px;
+	border: 1px solid var(--border-color);
+	font-size: 12px;
+	background: var(--bg-light-gray);
+	color: var(--text-muted);
+}
+
+.request-ux-pipeline__step.is-current {
+	background: var(--bg-yellow);
+	border-color: var(--yellow-200, #f6e05e);
+	color: var(--text-color);
+	font-weight: 600;
+}
+
+.request-ux-pipeline__step.is-done {
+	background: var(--bg-green);
+	border-color: var(--green-200, #9ae6b4);
+	color: var(--text-color);
+}
+
+.request-ux-pipeline__step.is-skipped {
+	text-decoration: line-through;
+	opacity: 0.7;
+}
+
+.request-ux-pipeline__step.is-rejected {
+	background: var(--bg-red);
+	border-color: var(--red-200, #feb2b2);
+	color: var(--text-color);
+	font-weight: 600;
+}

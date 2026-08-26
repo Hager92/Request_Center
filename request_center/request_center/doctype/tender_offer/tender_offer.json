@@ -1,0 +1,63 @@
+{
+ "actions": [],
+ "creation": "2026-08-25 14:15:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "supplier",
+  "supplier_quotation",
+  "grand_total",
+  "expected_delivery_date",
+  "offer_status"
+ ],
+ "fields": [
+  {
+   "fieldname": "supplier",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Supplier",
+   "options": "Supplier",
+   "reqd": 1
+  },
+  {
+   "fieldname": "supplier_quotation",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Supplier Offer",
+   "options": "Supplier Quotation"
+  },
+  {
+   "fieldname": "grand_total",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Offer Amount",
+   "read_only": 1
+  },
+  {
+   "fieldname": "expected_delivery_date",
+   "fieldtype": "Date",
+   "label": "Delivery Date"
+  },
+  {
+   "default": "Received",
+   "fieldname": "offer_status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Status",
+   "options": "Received\nSubmitted\nAwarded\nRejected"
+  }
+ ],
+ "istable": 1,
+ "links": [],
+ "modified": "2026-08-25 14:15:00.000000",
+ "modified_by": "Administrator",
+ "module": "Request Center",
+ "name": "Tender Offer",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "sort_field": "idx",
+ "sort_order": "ASC",
+ "states": []
+}

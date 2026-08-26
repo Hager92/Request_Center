@@ -16,7 +16,7 @@ class RequestTypeRequirement(Document):
 
 		field_key: DF.Data
 		field_label: DF.Data
-		field_type: DF.Literal["Data", "Date", "Datetime", "Check", "Currency", "Int", "Float", "Text"]
+		field_type: DF.Literal["Data", "Date", "Number", "Text Area", "Datetime", "Check", "Currency", "Int", "Float", "Text", "Select", "Link"]
 		mandatory: DF.Check
 		options: DF.SmallText | None
 		parent: DF.Data

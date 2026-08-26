@@ -15,6 +15,7 @@
  ],
  "fields": [
   {
+   "description": "Approval sequence",
    "fieldname": "level",
    "fieldtype": "Int",
    "in_list_view": 1,
@@ -53,7 +54,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2026-08-10 12:24:39.037267",
+ "modified": "2026-08-24 17:35:00.000000",
  "modified_by": "Administrator",
  "module": "Request Center",
  "name": "Approval Matrix Level",

@@ -18,6 +18,7 @@ class RequestRequirementValue(Document):
 		field_label: DF.Data
 		field_type: DF.Data | None
 		is_mandatory: DF.Check
+		options: DF.SmallText | None
 		parent: DF.Data
 		parentfield: DF.Data
 		parenttype: DF.Data

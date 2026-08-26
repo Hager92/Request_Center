@@ -1,0 +1,308 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "TND-.YYYY.-.#####",
+ "creation": "2026-08-25 14:15:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "section_links",
+  "request",
+  "material_request",
+  "column_break_links",
+  "status",
+  "company",
+  "section_details",
+  "title",
+  "opening_date",
+  "column_break_dates",
+  "closing_date",
+  "external_reference",
+  "section_items",
+  "items",
+  "section_suppliers",
+  "suppliers",
+  "section_offers",
+  "offers",
+  "awarded_supplier",
+  "awarded_quotation",
+  "section_rfqs",
+  "rfqs",
+  "section_pos",
+  "purchase_orders",
+  "section_notes",
+  "notes"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_links",
+   "fieldtype": "Section Break",
+   "label": "Linked Requisition"
+  },
+  {
+   "description": "Original Request Center Material Request / purchase requisition",
+   "fieldname": "request",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Request",
+   "options": "Requests",
+   "reqd": 1
+  },
+  {
+   "description": "ERPNext Material Request created for the purchase shortfall",
+   "fieldname": "material_request",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Material Request",
+   "options": "Material Request"
+  },
+  {
+   "fieldname": "column_break_links",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "Open",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Status",
+   "options": "Draft\nOpen\nOffers Received\nAwarded\nClosed",
+   "reqd": 1
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company"
+  },
+  {
+   "fieldname": "section_details",
+   "fieldtype": "Section Break",
+   "label": "Tender Details"
+  },
+  {
+   "fieldname": "title",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Title",
+   "reqd": 1
+  },
+  {
+   "default": "Today",
+   "fieldname": "opening_date",
+   "fieldtype": "Date",
+   "label": "Opening Date"
+  },
+  {
+   "fieldname": "column_break_dates",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "closing_date",
+   "fieldtype": "Date",
+   "label": "Closing Date"
+  },
+  {
+   "fieldname": "external_reference",
+   "fieldtype": "Data",
+   "label": "External Reference"
+  },
+  {
+   "fieldname": "section_items",
+   "fieldtype": "Section Break",
+   "label": "Requested Products"
+  },
+  {
+   "description": "Products and quantities requested for this tender",
+   "fieldname": "items",
+   "fieldtype": "Table",
+   "label": "Requested Products",
+   "options": "Tender Item",
+   "reqd": 1
+  },
+  {
+   "fieldname": "section_suppliers",
+   "fieldtype": "Section Break",
+   "label": "Selected Suppliers"
+  },
+  {
+   "description": "Suppliers invited to offer on this tender",
+   "fieldname": "suppliers",
+   "fieldtype": "Table",
+   "label": "Selected Suppliers",
+   "options": "Tender Supplier",
+   "reqd": 1
+  },
+  {
+   "fieldname": "section_offers",
+   "fieldtype": "Section Break",
+   "label": "Supplier Offers"
+  },
+  {
+   "description": "Offers received from suppliers, usually as Supplier Quotations",
+   "fieldname": "offers",
+   "fieldtype": "Table",
+   "label": "Supplier Offers",
+   "options": "Tender Offer"
+  },
+  {
+   "fieldname": "awarded_supplier",
+   "fieldtype": "Link",
+   "label": "Awarded Supplier",
+   "options": "Supplier",
+   "read_only": 1
+  },
+  {
+   "fieldname": "awarded_quotation",
+   "fieldtype": "Link",
+   "label": "Awarded Offer",
+   "options": "Supplier Quotation",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_rfqs",
+   "fieldtype": "Section Break",
+   "label": "Related RFQs"
+  },
+  {
+   "fieldname": "rfqs",
+   "fieldtype": "Table",
+   "label": "Related RFQs",
+   "options": "Tender RFQ"
+  },
+  {
+   "fieldname": "section_pos",
+   "fieldtype": "Section Break",
+   "label": "Related Purchase Orders"
+  },
+  {
+   "fieldname": "purchase_orders",
+   "fieldtype": "Table",
+   "label": "Related Purchase Orders",
+   "options": "Tender Purchase Order"
+  },
+  {
+   "fieldname": "section_notes",
+   "fieldtype": "Section Break",
+   "label": "Notes"
+  },
+  {
+   "fieldname": "notes",
+   "fieldtype": "Text Editor",
+   "label": "Notes"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [
+  {
+   "group": "Requisition",
+   "link_doctype": "Requests",
+   "link_fieldname": "tender"
+  },
+  {
+   "group": "Purchase",
+   "link_doctype": "Material Request",
+   "link_fieldname": "request_center_tender"
+  },
+  {
+   "group": "Purchase",
+   "link_doctype": "Request for Quotation",
+   "link_fieldname": "request_center_tender"
+  },
+  {
+   "group": "Purchase",
+   "link_doctype": "Supplier Quotation",
+   "link_fieldname": "request_center_tender"
+  },
+  {
+   "group": "Purchase",
+   "link_doctype": "Purchase Order",
+   "link_fieldname": "request_center_tender"
+  }
+ ],
+ "modified": "2026-08-25 14:20:00.000000",
+ "modified_by": "Administrator",
+ "module": "Request Center",
+ "name": "Tender",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Execution Team",
+   "write": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Employee"
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Department Manager"
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Department Head"
+  }
+ ],
+ "row_format": "Dynamic",
+ "search_fields": "request,title,status",
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [
+  {
+   "color": "Gray",
+   "title": "Draft"
+  },
+  {
+   "color": "Orange",
+   "title": "Open"
+  },
+  {
+   "color": "Blue",
+   "title": "Offers Received"
+  },
+  {
+   "color": "Green",
+   "title": "Awarded"
+  },
+  {
+   "color": "Gray",
+   "title": "Closed"
+  }
+ ],
+ "title_field": "title",
+ "track_changes": 1
+}

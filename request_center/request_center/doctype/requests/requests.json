@@ -9,17 +9,47 @@
  "field_order": [
   "request_type_info_section",
   "request_type",
-  "department_manager",
   "department",
   "column_break_fbnd",
   "requested_by",
   "request_date",
+  "column_break_approver",
+  "current_approval_level",
+  "current_approver",
+  "status",
+  "approval_status_summary",
+  "section_break_tracking",
+  "approval_tracking",
   "section_break_hnux",
   "description",
+  "section_break_material",
+  "material_items",
+  "fulfillment_path",
+  "inventory_check_result",
+  "fulfillment_stage",
+  "section_break_material_workflow",
+  "material_workflow",
+  "linked_documents",
+  "material_suppliers",
+  "tender",
+  "rfq",
+  "purchase_order",
+  "tender_reference",
+  "tender_notes",
+  "supplier_comparison",
+  "comparison_method",
+  "recommended_quotation",
+  "selected_quotation",
+  "awarded_supplier",
+  "expected_delivery_date",
+  "comparison_notes",
   "section_break_tbxk",
   "requirements",
   "section_break_fhpv",
-  "status",
+  "category",
+  "department_manager",
+  "current_approver_user",
+  "days_elapsed",
   "amended_from",
   "section_break_rxck",
   "execution_doctype",
@@ -29,22 +59,36 @@
  ],
  "fields": [
   {
-   "description": "Selected request",
+   "description": "Type of request",
    "fieldname": "request_type",
    "fieldtype": "Link",
    "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "Request Type",
    "options": "Request Type",
    "reqd": 1
   },
   {
-   "description": "Fetched",
+   "description": "Request category",
+   "fetch_from": "request_type.category",
+   "fieldname": "category",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Category",
+   "read_only": 1
+  },
+  {
+   "description": "Taken from the selected Request Type. Cannot be changed on the request.",
    "fetch_from": "request_type.department",
    "fieldname": "department",
    "fieldtype": "Link",
    "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "Department",
    "options": "Department",
+   "read_only": 1,
    "reqd": 1
   },
   {
@@ -52,50 +96,109 @@
    "fetch_from": "request_type.department_manager",
    "fieldname": "department_manager",
    "fieldtype": "Link",
+   "hidden": 1,
    "label": "Department Manager",
    "options": "User"
   },
   {
-   "default": "user",
-   "description": "Current user",
+   "description": "Automatically populated with the current employee. Cannot be changed.",
    "fieldname": "requested_by",
    "fieldtype": "Link",
    "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "Requested By",
    "options": "User",
+   "read_only": 1,
    "reqd": 1
   },
   {
    "default": "Now",
-   "description": "Now",
+   "description": "Automatically populated with the current date. Cannot be changed.",
    "fieldname": "request_date",
    "fieldtype": "Datetime",
    "in_list_view": 1,
    "label": "Request Date",
+   "read_only": 1,
    "reqd": 1
   },
   {
-   "description": "Explanation",
+   "description": "Additional request details",
    "fieldname": "description",
    "fieldtype": "Text Editor",
    "label": "Description"
   },
   {
-   "description": "Dynamic values",
+   "description": "Additional fields configured for the selected Request Type",
    "fieldname": "requirements",
    "fieldtype": "Table",
-   "label": "Requirements",
+   "label": "Additional Fields",
    "options": "Request Requirement Value"
   },
   {
-   "description": "Workflow",
+   "default": "Draft",
+   "description": "Read only for the requester. Updated by Submit, Approve, Reject, and fulfillment actions.",
    "fieldname": "status",
    "fieldtype": "Select",
    "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "Status",
-   "options": "Draft\nPending Manager\nPending Department\nApproved\nIn Progress\nCompleted\nRejected",
+   "options": "Draft\nNeed Approval\nApproved\nRejected\nCompleted\nIn Progress\nPending Approval\nPending Manager\nPending Department",
    "read_only": 1,
    "reqd": 1
+  },
+  {
+   "description": "The Approval Level currently waiting, from the selected Request Type.",
+   "fieldname": "current_approval_level",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Current Approval Level",
+   "read_only": 1
+  },
+  {
+   "description": "Current status, level, and approver in one line. Example: Need Approval \u2014 Level 2: Mohamed",
+   "fieldname": "approval_status_summary",
+   "fieldtype": "Small Text",
+   "in_list_view": 1,
+   "label": "Approval Status",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_tracking",
+   "fieldtype": "Section Break",
+   "label": "Approval Tracking"
+  },
+  {
+   "description": "Each row is one approval level from the Request Type. Status is Approved, Need Approval, or Pending.",
+   "fieldname": "approval_tracking",
+   "fieldtype": "Table",
+   "label": "Approval Tracking",
+   "options": "Request Approval Tracking",
+   "read_only": 1
+  },
+  {
+   "fieldname": "current_approver_user",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Current Approver User",
+   "options": "User",
+   "read_only": 1
+  },
+  {
+   "description": "Person currently responsible for approval",
+   "fieldname": "current_approver",
+   "fieldtype": "Small Text",
+   "in_list_view": 1,
+   "label": "Current Approver",
+   "read_only": 1
+  },
+  {
+   "description": "Number of days since request creation",
+   "fieldname": "days_elapsed",
+   "fieldtype": "Int",
+   "hidden": 1,
+   "in_list_view": 1,
+   "label": "Days Elapsed",
+   "read_only": 1
   },
   {
    "fieldname": "amended_from",
@@ -117,34 +220,209 @@
    "description": "Target document type for execution",
    "fieldname": "execution_doctype",
    "fieldtype": "Data",
-   "label": "Execution DocType"
+   "label": "Execution DocType",
+   "read_only": 1
   },
   {
    "description": "Generated document reference",
    "fieldname": "execution_docname",
    "fieldtype": "Data",
-   "label": "Execution DocName"
+   "label": "Execution DocName",
+   "read_only": 1
   },
   {
    "fieldname": "request_type_info_section",
    "fieldtype": "Section Break",
-   "label": "Request Type Info"
+   "label": "Request"
   },
   {
    "fieldname": "column_break_fbnd",
    "fieldtype": "Column Break"
   },
   {
+   "fieldname": "column_break_approver",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval:doc.category==\"Material Request\"",
+   "description": "Items to issue from stock or purchase. After all Approval Levels are completed, inventory is checked first. Any shortfall follows Purchase. That path is not configured on Approval Levels.",
+   "fieldname": "section_break_material",
+   "fieldtype": "Section Break",
+   "label": "Material Items"
+  },
+  {
+   "depends_on": "eval:doc.category==\"Material Request\"",
+   "fieldname": "material_items",
+   "fieldtype": "Table",
+   "label": "Material Items",
+   "options": "Request Material Item"
+  },
+  {
+   "depends_on": "eval:doc.category==\"Material Request\"",
+   "description": "Set after Inventory Check: Inventory, Internal Transfer, Purchase, or a combination.",
+   "fieldname": "fulfillment_path",
+   "fieldtype": "Data",
+   "label": "Fulfillment Path",
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval:doc.category==\"Material Request\"",
+   "description": "After required approvals the system checks inventory. Available material proceeds to Internal Transfer / Issuance. Material that is not available proceeds to the Purchase Process.",
+   "fieldname": "inventory_check_result",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Inventory Check",
+   "options": "\nAvailable\nNot Available\nPartially Available",
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval:doc.fulfillment_stage",
+   "description": "Current stage after approval: Service / Other Process, or the Material Request path.",
+   "fieldname": "fulfillment_stage",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Fulfillment Stage",
+   "read_only": 1
+  },
+  {
+   "collapsible": 1,
+   "depends_on": "eval:doc.category==\"Material Request\"",
+   "description": "If material is not in inventory, the Purchase Process is: Supplier Selection, Tender, RFQ, Supplier Comparison, Purchase Order, then Delivery. Every purchasing document stays linked to this request.",
+   "fieldname": "section_break_material_workflow",
+   "fieldtype": "Section Break",
+   "label": "Material Request Workflow"
+  },
+  {
+   "depends_on": "eval:doc.category==\"Material Request\"",
+   "fieldname": "material_workflow",
+   "fieldtype": "Table",
+   "label": "Workflow Steps",
+   "options": "Request Material Workflow Step",
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval:doc.category==\"Material Request\"",
+   "description": "Purchasing and inventory documents created from this request. Each document also stores a link back to this requisition.",
+   "fieldname": "linked_documents",
+   "fieldtype": "Table",
+   "label": "Linked Documents",
+   "options": "Request Linked Document",
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval:doc.category==\"Material Request\"",
+   "description": "Suppliers considered for the Purchase path. Required at Supplier Selection.",
+   "fieldname": "material_suppliers",
+   "fieldtype": "Table",
+   "label": "Suppliers",
+   "options": "Request Material Supplier"
+  },
+  {
+   "depends_on": "eval:doc.category==\"Material Request\"",
+   "description": "Tender used to collect supplier offers for this Material Request / purchase requisition.",
+   "fieldname": "tender",
+   "fieldtype": "Link",
+   "label": "Tender",
+   "options": "Tender",
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval:doc.category==\"Material Request\"",
+   "description": "RFQ sent to the suppliers selected on the Tender. Their offers are compared next.",
+   "fieldname": "rfq",
+   "fieldtype": "Link",
+   "label": "RFQ",
+   "options": "Request for Quotation",
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval:doc.category==\"Material Request\"",
+   "description": "Purchase Order created after supplier comparison. Linked to this requisition, the Material Request, the Tender, and the selected supplier.",
+   "fieldname": "purchase_order",
+   "fieldtype": "Link",
+   "label": "Purchase Order",
+   "options": "Purchase Order",
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval:doc.category==\"Material Request\"",
+   "fieldname": "tender_reference",
+   "fieldtype": "Data",
+   "label": "Tender Reference"
+  },
+  {
+   "depends_on": "eval:doc.category==\"Material Request\"",
+   "fieldname": "tender_notes",
+   "fieldtype": "Small Text",
+   "label": "Tender Notes"
+  },
+  {
+   "depends_on": "eval:doc.category==\"Material Request\"",
+   "description": "Each supplier offer is listed with Price and Delivery Time. Rank and score follow the Request Type purchasing policy. The purchasing team selects a supplier after reviewing this table.",
+   "fieldname": "supplier_comparison",
+   "fieldtype": "Table",
+   "label": "Supplier Comparison",
+   "options": "Request Supplier Comparison",
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval:doc.category==\"Material Request\"",
+   "fieldname": "comparison_method",
+   "fieldtype": "Data",
+   "label": "Comparison Method",
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval:doc.category==\"Material Request\"",
+   "description": "Best offer according to Price and Delivery Time under the current purchasing policy. The purchasing team still confirms the supplier.",
+   "fieldname": "recommended_quotation",
+   "fieldtype": "Link",
+   "label": "Recommended Offer",
+   "options": "Supplier Quotation",
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval:doc.category==\"Material Request\"",
+   "fieldname": "selected_quotation",
+   "fieldtype": "Link",
+   "label": "Selected Supplier Quotation",
+   "options": "Supplier Quotation"
+  },
+  {
+   "depends_on": "eval:doc.category==\"Material Request\"",
+   "fieldname": "awarded_supplier",
+   "fieldtype": "Link",
+   "label": "Awarded Supplier",
+   "options": "Supplier",
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval:doc.category==\"Material Request\"",
+   "fieldname": "expected_delivery_date",
+   "fieldtype": "Date",
+   "label": "Expected Delivery Date"
+  },
+  {
+   "depends_on": "eval:doc.category==\"Material Request\"",
+   "description": "Why this supplier was selected after comparing Price and Delivery Time.",
+   "fieldname": "comparison_notes",
+   "fieldtype": "Small Text",
+   "label": "Selection Notes"
+  },
+  {
    "fieldname": "section_break_hnux",
-   "fieldtype": "Section Break"
+   "fieldtype": "Section Break",
+   "label": "Description"
   },
   {
    "fieldname": "section_break_tbxk",
-   "fieldtype": "Section Break"
+   "fieldtype": "Section Break",
+   "label": "Additional Fields"
   },
   {
    "fieldname": "section_break_fhpv",
-   "fieldtype": "Section Break"
+   "fieldtype": "Section Break",
+   "hidden": 1
   },
   {
    "fieldname": "section_break_rxck",
@@ -158,8 +436,44 @@
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
- "links": [],
- "modified": "2026-08-05 16:29:07.326010",
+ "links": [
+  {
+   "group": "Purchase",
+   "link_doctype": "Tender",
+   "link_fieldname": "request"
+  },
+  {
+   "group": "Purchase",
+   "link_doctype": "Material Request",
+   "link_fieldname": "request_center_request"
+  },
+  {
+   "group": "Purchase",
+   "link_doctype": "Request for Quotation",
+   "link_fieldname": "request_center_request"
+  },
+  {
+   "group": "Purchase",
+   "link_doctype": "Supplier Quotation",
+   "link_fieldname": "request_center_request"
+  },
+  {
+   "group": "Purchase",
+   "link_doctype": "Purchase Order",
+   "link_fieldname": "request_center_request"
+  },
+  {
+   "group": "Purchase",
+   "link_doctype": "Purchase Receipt",
+   "link_fieldname": "request_center_request"
+  },
+  {
+   "group": "Inventory",
+   "link_doctype": "Stock Entry",
+   "link_fieldname": "request_center_request"
+  }
+ ],
+ "modified": "2026-08-26 10:12:56.663595",
  "modified_by": "Administrator",
  "module": "Request Center",
  "name": "Requests",
@@ -177,11 +491,83 @@
    "role": "System Manager",
    "share": 1,
    "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "if_owner": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Employee",
+   "write": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Employee"
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Department Manager",
+   "write": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Department Head",
+   "write": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Execution Team",
+   "write": 1
   }
  ],
  "row_format": "Dynamic",
  "rows_threshold_for_grid_search": 20,
+ "search_fields": "request_type,category,status,department,requested_by",
  "sort_field": "creation",
  "sort_order": "DESC",
- "states": []
+ "states": [
+  {
+   "color": "Gray",
+   "title": "Draft"
+  },
+  {
+   "color": "Orange",
+   "title": "Need Approval"
+  },
+  {
+   "color": "Green",
+   "title": "Approved"
+  },
+  {
+   "color": "Red",
+   "title": "Rejected"
+  },
+  {
+   "color": "Blue",
+   "title": "Completed"
+  },
+  {
+   "color": "Yellow",
+   "title": "In Progress"
+  }
+ ]
 }

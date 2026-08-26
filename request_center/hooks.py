@@ -1,7 +1,7 @@
 app_name = "request_center"
 app_title = "Request Center"
 app_publisher = "Hager"
-app_description = "Request Center app"
+app_description = "Create, configure, approve, track, and manage employee requests."
 app_email = "Hager@gmail.com"
 app_license = "mit"
 
@@ -11,22 +11,20 @@ app_license = "mit"
 # required_apps = []
 
 # Each item in the list will be shown as an app in the apps page
-# add_to_apps_screen = [
-# 	{
-# 		"name": "request_center",
-# 		"logo": "/assets/request_center/logo.png",
-# 		"title": "Request Center",
-# 		"route": "/request_center",
-# 		"has_permission": "request_center.api.permission.has_app_permission"
-# 	}
-# ]
+add_to_apps_screen = [
+	{
+		"name": "request_center",
+		"title": "Request Center",
+		"route": "/app/request-center-home",
+	}
+]
 
 # Includes in <head>
 # ------------------
 
 # include js, css files in header of desk.html
-# app_include_css = "/assets/request_center/css/request_center.css"
-# app_include_js = "/assets/request_center/js/request_center.js"
+app_include_css = "/assets/request_center/css/request_center.css"
+app_include_js = "/assets/request_center/js/request_center.js"
 
 # include js, css files in header of web template
 # web_include_css = "/assets/request_center/css/request_center.css"
@@ -87,6 +85,18 @@ app_license = "mit"
 
 # before_install = "request_center.install.before_install"
 # after_install = "request_center.install.after_install"
+after_install = [
+	"request_center.setup.request_categories.ensure_request_categories",
+	"request_center.setup.request_type_config.migrate_approval_levels_onto_request_types",
+	"request_center.setup.request_type_config.migrate_request_approval_workflow",
+	"request_center.setup.purchase_links.ensure_purchase_document_links",
+]
+after_migrate = [
+	"request_center.setup.request_categories.ensure_request_categories",
+	"request_center.setup.request_type_config.migrate_approval_levels_onto_request_types",
+	"request_center.setup.request_type_config.migrate_request_approval_workflow",
+	"request_center.setup.purchase_links.ensure_purchase_document_links",
+]
 
 # Uninstallation
 # ------------
@@ -126,13 +136,13 @@ app_license = "mit"
 # -----------
 # Permissions evaluated in scripted ways
 
-# permission_query_conditions = {
-# 	"Event": "frappe.desk.doctype.event.event.get_permission_query_conditions",
-# }
-#
-# has_permission = {
-# 	"Event": "frappe.desk.doctype.event.event.has_permission",
-# }
+permission_query_conditions = {
+	"Requests": "request_center.permissions.get_request_permission_query_conditions",
+}
+
+has_permission = {
+	"Requests": "request_center.permissions.has_request_permission",
+}
 
 # Document Events
 # ---------------
@@ -149,23 +159,11 @@ app_license = "mit"
 # Scheduled Tasks
 # ---------------
 
-# scheduler_events = {
-# 	"all": [
-# 		"request_center.tasks.all"
-# 	],
-# 	"daily": [
-# 		"request_center.tasks.daily"
-# 	],
-# 	"hourly": [
-# 		"request_center.tasks.hourly"
-# 	],
-# 	"weekly": [
-# 		"request_center.tasks.weekly"
-# 	],
-# 	"monthly": [
-# 		"request_center.tasks.monthly"
-# 	],
-# }
+scheduler_events = {
+	"daily": [
+		"request_center.request_center.doctype.requests.requests.update_request_list_tracking"
+	],
+}
 
 # Testing
 # -------
@@ -186,6 +184,9 @@ app_license = "mit"
 # override_whitelisted_methods = {
 # 	"frappe.desk.doctype.event.event.get_events": "request_center.event.get_events"
 # }
+override_whitelisted_methods = {
+	"frappe.model.workflow.apply_workflow": "request_center.api.requests.apply_workflow"
+}
 #
 # each overriding function accepts a `data` argument;
 # generated from the base implementation of the doctype dashboard,
@@ -259,9 +260,6 @@ require_type_annotated_api_methods = True
 # List of apps whose translatable strings should be excluded from this app's translations.
 # ignore_translatable_strings_from = []
 
-doctype_js = {
-    "Requests": "public/js/requests.js",
-}
 fixtures = [
     {
         "doctype": "Workflow",
@@ -273,6 +271,17 @@ fixtures = [
         "doctype": "Workspace",
         "filters": [
             ["name", "=", "Request Center"]
+        ]
+    },
+    {
+        "doctype": "Request Category",
+        "filters": [
+            ["name", "in", [
+                "Service Request",
+                "Material Request",
+                "Disbursement Request",
+                "Other Requests"
+            ]]
         ]
     }
 ]

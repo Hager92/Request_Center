@@ -7,18 +7,35 @@
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
+  "basic_information_section",
   "request_type_name",
+  "category",
   "department",
-  "is_active",
   "column_break_gred",
   "department_manager",
-  "execution_mode",
+  "is_active",
+  "icon",
   "section_break_zjlo",
-  "requirements"
+  "form_fields_help",
+  "requirements",
+  "approval_levels_section",
+  "approval_levels_help",
+  "approval_levels",
+  "execution_section",
+  "execution_mode",
+  "purchasing_policy_section",
+  "material_fulfillment_help",
+  "comparison_method",
+  "rank_primary",
+  "column_break_comparison",
+  "price_weight",
+  "delivery_weight",
+  "comparison_policy_help",
+  "approval_matrix"
  ],
  "fields": [
   {
-   "description": "Unique name",
+   "description": "Unique name of this Request Type. Used on the dashboard and on new requests.",
    "fieldname": "request_type_name",
    "fieldtype": "Data",
    "in_list_view": 1,
@@ -27,7 +44,7 @@
    "unique": 1
   },
   {
-   "description": "Owner",
+   "description": "Department responsible for this Request Type. Copied onto the Request Form when the type is selected.",
    "fieldname": "department",
    "fieldtype": "Link",
    "in_list_view": 1,
@@ -36,32 +53,145 @@
    "reqd": 1
   },
   {
-   "description": "Fetched",
+   "description": "Manager of the selected department. Used as the approver when an Approval Level is assigned to the Department Manager role.",
    "fetch_from": "department.custom_department_manager",
    "fieldname": "department_manager",
    "fieldtype": "Link",
    "label": "Department Manager",
-   "options": "User"
+   "options": "User",
+   "read_only": 1
+  },
+  {
+   "description": "Each Request Type must use one of: Service Request, Material Request, Disbursement Request, Other Requests. All material-related requests use Material Request. Approval Levels on this type still apply. After those approvals, fulfillment is a fixed Inventory then Purchase process.",
+   "fieldname": "category",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Request Category",
+   "options": "Service Request\nMaterial Request\nDisbursement Request\nOther Requests",
+   "reqd": 1
   },
   {
    "default": "0",
-   "description": "Enabled",
+   "description": "Only active types appear on the Request Center dashboard and in Request Type selection.",
    "fieldname": "is_active",
    "fieldtype": "Check",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "Is Active"
   },
   {
-   "description": "Dynamic field definitions",
+   "description": "Add a row for each Dynamic Form Field. Field Name, Field Type, and Mandatory Fields are configured here.",
    "fieldname": "requirements",
    "fieldtype": "Table",
-   "label": "Requirements",
+   "label": "Form Fields",
    "options": "Request Type Requirement"
   },
   {
+   "fieldname": "form_fields_help",
+   "fieldtype": "HTML",
+   "options": "<p class=\"text-muted\">Dynamic Form Fields for this Request Type. Set Field Name, Field Type, and Mandatory. Mandatory fields must be completed before the employee submits the request.</p>"
+  },
+  {
+   "description": "Each row is one approval level. Approvers and Approval Sequence (Level) are configured on this page.",
+   "fieldname": "approval_levels",
+   "fieldtype": "Table",
+   "label": "Approval Levels",
+   "options": "Request Type Approval Level"
+  },
+  {
+   "fieldname": "approval_levels_help",
+   "fieldtype": "HTML",
+   "options": "<p class=\"text-muted\">Approvers and Approval Sequence are set here. Level is the sequence: Level 1 approves first, then Level 2, and so on. Check Required if that approver must act.</p>"
+  },
+  {
+   "fieldname": "icon",
+   "fieldtype": "Icon",
+   "label": "Request Type Icon"
+  },
+  {
+   "depends_on": "eval:doc.category!=\"Material Request\"",
+   "fieldname": "execution_section",
+   "fieldtype": "Section Break",
+   "label": "Execution"
+  },
+  {
+   "depends_on": "eval:doc.category!=\"Material Request\"",
+   "description": "Choose an existing Execution Mode. After approval, Service and Other requests follow that mode. Material Request does not use this field.",
    "fieldname": "execution_mode",
    "fieldtype": "Link",
    "label": "Execution Mode",
    "options": "Execution Mode"
+  },
+  {
+   "depends_on": "eval:doc.category==\"Material Request\"",
+   "fieldname": "material_fulfillment_help",
+   "fieldtype": "HTML",
+   "options": "<div class=\"alert alert-info\">Material Request uses the same Approval Levels as other types. After every required approval: Inventory Check, then Internal Transfer / Issuance if stock is available, or the Purchase Process (Supplier Selection, Tender, RFQ, Supplier Comparison, Purchase Order, Delivery). Supplier Comparison always shows Price and Delivery Time. Rank and score follow the purchasing policy below. Purchasing documents stay linked to the original request. That path is not configured through Approval Levels.</div>"
+  },
+  {
+   "depends_on": "eval:doc.category==\"Material Request\"",
+   "fieldname": "purchasing_policy_section",
+   "fieldtype": "Section Break",
+   "label": "Purchasing Policy"
+  },
+  {
+   "default": "Weighted Score",
+   "depends_on": "eval:doc.category==\"Material Request\"",
+   "description": "How the purchasing team compares supplier offers. Price and Delivery Time are always shown. Manual Comparison leaves the final choice to the team. Weighted Score combines both criteria. Ranked Criteria orders suppliers by the primary criterion, then the other.",
+   "fieldname": "comparison_method",
+   "fieldtype": "Select",
+   "label": "Supplier Comparison Method",
+   "options": "Manual Comparison\nWeighted Score\nRanked Criteria"
+  },
+  {
+   "default": "Price",
+   "depends_on": "eval:doc.category==\"Material Request\" && doc.comparison_method==\"Ranked Criteria\"",
+   "description": "Suppliers are ranked by this criterion first. The other criterion (Price or Delivery Time) is used to break ties.",
+   "fieldname": "rank_primary",
+   "fieldtype": "Select",
+   "label": "Rank First By",
+   "options": "Price\nDelivery Time"
+  },
+  {
+   "depends_on": "eval:doc.category==\"Material Request\"",
+   "fieldname": "column_break_comparison",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "50",
+   "depends_on": "eval:doc.category==\"Material Request\" && doc.comparison_method==\"Weighted Score\"",
+   "description": "Share of the comparison score that comes from a lower price. Must add to 100 with Delivery Time Weight.",
+   "fieldname": "price_weight",
+   "fieldtype": "Percent",
+   "label": "Price Weight"
+  },
+  {
+   "default": "50",
+   "depends_on": "eval:doc.category==\"Material Request\" && doc.comparison_method==\"Weighted Score\"",
+   "description": "Share of the comparison score that comes from a faster delivery. Must add to 100 with Price Weight.",
+   "fieldname": "delivery_weight",
+   "fieldtype": "Percent",
+   "label": "Delivery Time Weight"
+  },
+  {
+   "depends_on": "eval:doc.category==\"Material Request\"",
+   "fieldname": "comparison_policy_help",
+   "fieldtype": "HTML",
+   "options": "<p class=\"text-muted\">The comparison table always lists Supplier, Price, and Delivery Time. A lower price and a shorter delivery time score higher. The purchasing team confirms the supplier after reviewing the ranked offers.</p>"
+  },
+  {
+   "description": "Legacy. Approval is configured on this Request Type under Approval Levels.",
+   "fieldname": "approval_matrix",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Approval Matrix",
+   "options": "Approval Matrix"
+  },
+  {
+   "fieldname": "basic_information_section",
+   "fieldtype": "Section Break",
+   "label": "Basic Information"
   },
   {
    "fieldname": "column_break_gred",
@@ -69,13 +199,19 @@
   },
   {
    "fieldname": "section_break_zjlo",
-   "fieldtype": "Section Break"
+   "fieldtype": "Section Break",
+   "label": "Dynamic Form Fields"
+  },
+  {
+   "fieldname": "approval_levels_section",
+   "fieldtype": "Section Break",
+   "label": "Approval Levels"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-08-04 15:05:51.072915",
+ "modified": "2026-08-25 19:30:00.000000",
  "modified_by": "Administrator",
  "module": "Request Center",
  "name": "Request Type",
@@ -93,11 +229,46 @@
    "role": "System Manager",
    "share": 1,
    "write": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Employee"
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Department Manager"
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Department Head"
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Execution Team"
   }
  ],
  "row_format": "Dynamic",
  "rows_threshold_for_grid_search": 20,
- "sort_field": "creation",
- "sort_order": "DESC",
+ "search_fields": "request_type_name,category,department",
+ "sort_field": "request_type_name",
+ "sort_order": "ASC",
+ "title_field": "request_type_name",
+ "track_changes": 1,
  "states": []
 }

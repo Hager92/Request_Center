@@ -9,50 +9,26 @@
  "docstatus": 0,
  "doctype": "Notification",
  "document_type": "Requests",
- "enabled": 1,
+ "enabled": 0,
  "event": "Value Change",
  "idx": 0,
  "is_standard": 1,
- "message": "<p>Hello,</p>\n\n<p>Request {{ doc.name }} is now in state: {{ doc.status }}</p>\n\n<p>Requested by: {{ doc.owner }}</p>\n\n<p>Thanks.</p>\n",
- "message_type": "Markdown",
+ "message": "<p>Request {{ doc.name }}: {{ doc.approval_status_summary or doc.status }}</p>\n<p>Open the request in Request Center for details.</p>",
+ "message_type": "HTML",
  "minutes_offset": 0,
- "modified": "2026-08-02 13:28:06.107232",
+ "modified": "2026-08-25 13:20:00.000000",
  "modified_by": "Administrator",
  "module": "Request Center",
  "name": "Requests Notification",
  "owner": "Administrator",
  "recipients": [
   {
-   "condition": "doc.status=='Draft'",
-   "receiver_by_role": "Employee"
-  },
-  {
-   "condition": "doc.status=='Pending Manager'",
-   "receiver_by_role": "Department Manager"
-  },
-  {
-   "condition": "doc.status=='Pending Department'",
-   "receiver_by_role": "Department Head"
-  },
-  {
-   "condition": "doc.status=='Approved'",
-   "receiver_by_role": "Execution Team"
-  },
-  {
-   "condition": "doc.status=='In Progress'",
-   "receiver_by_role": "Execution Team"
-  },
-  {
-   "condition": "doc.status=='Rejected'",
-   "receiver_by_role": "Employee"
-  },
-  {
-   "condition": "doc.status=='Completed'",
-   "receiver_by_role": "Employee"
+   "condition": "",
+   "receiver_by_document_field": "requested_by"
   }
  ],
- "send_system_notification": 0,
- "send_to_all_assignees": 1,
- "subject": "Requests {{ doc.name }} moved to {{ doc.status }}",
+ "send_system_notification": 1,
+ "send_to_all_assignees": 0,
+ "subject": "Request {{ doc.name }}: {{ doc.approval_status_summary or doc.status }}",
  "value_changed": "status"
 }

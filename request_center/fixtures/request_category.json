@@ -1,0 +1,34 @@
+[
+ {
+  "category_name": "Service Request",
+  "description": "Requests for services rather than goods or materials.",
+  "docstatus": 0,
+  "doctype": "Request Category",
+  "modified": "2026-08-24 17:30:00.000000",
+  "name": "Service Request"
+ },
+ {
+  "category_name": "Material Request",
+  "description": "All material-related requests use this category. Approval Levels on the Request Type still determine who must approve. After those approvals the request follows a fixed workflow: Inventory Check, then Internal Transfer / Issuance if stock is available, or Purchase then Supplier Selection, Tender, RFQ, Supplier Comparison, Price + Delivery, PO, Delivery, and Completed. Purchase Request and Inventory / Issuance are not separate top-level categories, and this path is not configured through Approval Levels.",
+  "docstatus": 0,
+  "doctype": "Request Category",
+  "modified": "2026-08-24 17:30:00.000000",
+  "name": "Material Request"
+ },
+ {
+  "category_name": "Disbursement Request",
+  "description": "Requests involving payment or disbursement of funds.",
+  "docstatus": 0,
+  "doctype": "Request Category",
+  "modified": "2026-08-24 17:30:00.000000",
+  "name": "Disbursement Request"
+ },
+ {
+  "category_name": "Other Requests",
+  "description": "Requests that do not fall under Service, Material, or Disbursement.",
+  "docstatus": 0,
+  "doctype": "Request Category",
+  "modified": "2026-08-24 17:30:00.000000",
+  "name": "Other Requests"
+ }
+]

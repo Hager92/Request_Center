@@ -1,0 +1,138 @@
+{
+ "actions": [],
+ "creation": "2026-08-25 14:25:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "rank",
+  "supplier",
+  "supplier_name",
+  "price",
+  "currency",
+  "delivery_time",
+  "delivery_date",
+  "delivery_days",
+  "price_score",
+  "delivery_score",
+  "total_score",
+  "recommended",
+  "selected",
+  "supplier_quotation"
+ ],
+ "fields": [
+  {
+   "fieldname": "rank",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Rank",
+   "read_only": 1
+  },
+  {
+   "fieldname": "supplier",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Supplier",
+   "options": "Supplier",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fetch_from": "supplier.supplier_name",
+   "fieldname": "supplier_name",
+   "fieldtype": "Data",
+   "label": "Supplier Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "price",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Price",
+   "options": "currency",
+   "read_only": 1
+  },
+  {
+   "fieldname": "currency",
+   "fieldtype": "Link",
+   "label": "Currency",
+   "options": "Currency",
+   "read_only": 1
+  },
+  {
+   "description": "Expected delivery time offered by the supplier",
+   "fieldname": "delivery_time",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Delivery Time",
+   "read_only": 1
+  },
+  {
+   "fieldname": "delivery_date",
+   "fieldtype": "Date",
+   "label": "Delivery Date",
+   "read_only": 1
+  },
+  {
+   "fieldname": "delivery_days",
+   "fieldtype": "Int",
+   "label": "Delivery Days",
+   "read_only": 1
+  },
+  {
+   "fieldname": "price_score",
+   "fieldtype": "Float",
+   "label": "Price Score",
+   "precision": "2",
+   "read_only": 1
+  },
+  {
+   "fieldname": "delivery_score",
+   "fieldtype": "Float",
+   "label": "Delivery Score",
+   "precision": "2",
+   "read_only": 1
+  },
+  {
+   "fieldname": "total_score",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Score",
+   "precision": "2",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "recommended",
+   "fieldtype": "Check",
+   "label": "Recommended",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "selected",
+   "fieldtype": "Check",
+   "label": "Selected",
+   "read_only": 1
+  },
+  {
+   "fieldname": "supplier_quotation",
+   "fieldtype": "Link",
+   "label": "Supplier Quotation",
+   "options": "Supplier Quotation",
+   "read_only": 1
+  }
+ ],
+ "istable": 1,
+ "links": [],
+ "modified": "2026-08-25 14:25:00.000000",
+ "modified_by": "Administrator",
+ "module": "Request Center",
+ "name": "Request Supplier Comparison",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "sort_field": "rank",
+ "sort_order": "ASC",
+ "states": []
+}

@@ -8,13 +8,12 @@
   {
    "child": 0,
    "collapsible": 1,
-   "icon": "list",
+   "icon": "project",
    "indent": 0,
    "keep_closed": 0,
    "label": "Request Center",
-   "link_to": "Request Center",
-   "link_type": "Workspace",
-   "open_in_new_tab": 1,
+   "link_to": "request-center-home",
+   "link_type": "Page",
    "show_arrow": 0,
    "type": "Link"
   },
@@ -24,10 +23,9 @@
    "icon": "list",
    "indent": 0,
    "keep_closed": 0,
-   "label": "Requests",
+   "label": "All Requests",
    "link_to": "Requests",
    "link_type": "DocType",
-   "open_in_new_tab": 1,
    "show_arrow": 0,
    "type": "Link"
   },
@@ -40,7 +38,6 @@
    "label": "Request Type",
    "link_to": "Request Type",
    "link_type": "DocType",
-   "open_in_new_tab": 1,
    "show_arrow": 0,
    "type": "Link"
   },
@@ -50,10 +47,9 @@
    "icon": "list",
    "indent": 0,
    "keep_closed": 0,
-   "label": "Approval Matrix",
-   "link_to": "Approval Matrix",
+   "label": "Tender",
+   "link_to": "Tender",
    "link_type": "DocType",
-   "open_in_new_tab": 1,
    "show_arrow": 0,
    "type": "Link"
   },
@@ -66,7 +62,6 @@
    "label": "Execution Mode",
    "link_to": "Execution Mode",
    "link_type": "DocType",
-   "open_in_new_tab": 1,
    "show_arrow": 0,
    "type": "Link"
   },
@@ -79,12 +74,11 @@
    "label": "Document Mapping",
    "link_to": "Document Mapping",
    "link_type": "DocType",
-   "open_in_new_tab": 1,
    "show_arrow": 0,
    "type": "Link"
   }
  ],
- "modified": "2026-08-06 17:36:28.978401",
+ "modified": "2026-08-25 15:20:00.000000",
  "modified_by": "Administrator",
  "module": "Request Center",
  "name": "Request Center",
