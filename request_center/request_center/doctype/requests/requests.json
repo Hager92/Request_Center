@@ -224,9 +224,9 @@
    "read_only": 1
   },
   {
-   "description": "Generated document reference",
+   "description": "Latest generated document. The full list is in Linked Documents.",
    "fieldname": "execution_docname",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Execution DocName",
    "read_only": 1
   },
@@ -474,7 +474,7 @@
    "link_fieldname": "request_center_request"
   }
  ],
- "modified": "2026-08-26 18:25:00.000000",
+ "modified": "2026-08-27 11:35:00.000000",
  "modified_by": "Administrator",
  "module": "Request Center",
  "name": "Requests",

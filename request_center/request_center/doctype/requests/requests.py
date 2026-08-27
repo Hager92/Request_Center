@@ -39,7 +39,7 @@ class Requests(Document):
         department: DF.Link
         department_manager: DF.Link | None
         description: DF.TextEditor | None
-        execution_docname: DF.Data | None
+        execution_docname: DF.SmallText | None
         execution_doctype: DF.Data | None
         expected_delivery_date: DF.Date | None
         fulfillment_path: DF.Data | None
@@ -79,6 +79,21 @@ class Requests(Document):
         self._validate_approval_matrix()
         self._validate_material_items()
         self._update_list_tracking_fields()
+        self._keep_latest_execution_docname()
+
+    def _keep_latest_execution_docname(self) -> None:
+        value = (self.execution_docname or "").strip()
+        if not value:
+            return
+        parts = [part.strip() for part in value.replace("\n", ",").split(",") if part.strip()]
+        if not parts:
+            self.execution_docname = None
+            return
+        latest = parts[-1]
+        df = self.meta.get_field("execution_docname")
+        if df and df.fieldtype == "Data" and len(latest) > 140:
+            latest = latest[:140]
+        self.execution_docname = latest
 
     def before_insert(self) -> None:
         self.requested_by = _session_requested_by()

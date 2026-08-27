@@ -64,7 +64,7 @@ ADVANCE_LABELS = {
 	STAGE_ISSUANCE: _("Create Issuance / Transfer"),
 	STAGE_PURCHASE: _("Start Purchase"),
 	STAGE_SUPPLIER_SELECTION: _("Confirm Suppliers"),
-	STAGE_TENDER: _("Complete Tender"),
+	STAGE_TENDER: _("Tender"),
 	STAGE_RFQ: _("Create and Send RFQ"),
 	STAGE_COMPARISON: _("Compare Quotations"),
 	STAGE_PRICE_DELIVERY: _("Confirm Price and Delivery"),
@@ -167,10 +167,7 @@ def _link_document(
 	if not doctype or not name:
 		return
 	doc.execution_doctype = doctype
-	existing = [part.strip() for part in str(getattr(doc, "execution_docname", None) or "").split(",") if part.strip()]
-	if name not in existing:
-		existing.append(name)
-	doc.execution_docname = ", ".join(existing)
+	doc.execution_docname = name
 	stamp_existing_document(doctype, name, doc.name)
 	if not hasattr(doc, "linked_documents"):
 		return
@@ -460,14 +457,19 @@ def get_material_workflow_action(request_name: str) -> Dict[str, Any]:
 				}
 			)
 	else:
+		seen_stages = set()
 		for row in doc.material_workflow or []:
 			if row.step_status != "Current":
 				continue
+			stage = STAGE_RFQ if row.stage == STAGE_TENDER else row.stage
+			if stage in seen_stages:
+				continue
+			seen_stages.add(stage)
 			stages.append(
 				{
-					"stage": row.stage,
-					"label": ADVANCE_LABELS.get(row.stage, row.stage),
-					"prompt": _prompt_for(row.stage),
+					"stage": stage,
+					"label": ADVANCE_LABELS.get(stage, stage),
+					"prompt": _prompt_for(stage),
 				}
 			)
 	return {
@@ -480,8 +482,6 @@ def get_material_workflow_action(request_name: str) -> Dict[str, Any]:
 
 
 def _prompt_for(stage: str) -> Optional[str]:
-	if stage == STAGE_TENDER:
-		return "tender"
 	if stage == STAGE_PRICE_DELIVERY:
 		return "price_delivery"
 	if stage == STAGE_COMPARISON:
@@ -512,6 +512,10 @@ def advance_material_workflow(
 	target = stage or (current[0] if current else None)
 	if not target:
 		frappe.throw(_("There is no Material Request workflow step to advance"))
+	if target == STAGE_RFQ and STAGE_TENDER in current and STAGE_RFQ not in current:
+		_set_step(doc, STAGE_TENDER, "Done", "Tender", getattr(doc, "tender", None))
+		_set_step(doc, STAGE_RFQ, "Current")
+		current = [row.stage for row in doc.material_workflow if row.step_status == "Current"]
 	if target not in current and target != STAGE_COMPLETED:
 		frappe.throw(_("Stage {0} is not waiting to be advanced").format(target))
 
@@ -620,6 +624,7 @@ def _advance_supplier_selection(doc) -> str:
 	doc.tender = tender.name
 	copy_suppliers_to_request(tender)
 	doc.reload()
+	doc.tender = tender.name
 	suppliers = [row.supplier for row in (doc.material_suppliers or []) if row.supplier]
 	if not suppliers:
 		suppliers = [row.supplier for row in (tender.suppliers or []) if row.supplier]
@@ -632,7 +637,7 @@ def _advance_supplier_selection(doc) -> str:
 	_set_step(doc, STAGE_SUPPLIER_SELECTION, "Done", remarks=remarks)
 	_link_document(doc, "Tender", tender.name, STAGE_TENDER, "Purchase")
 	_set_step(doc, STAGE_TENDER, "Current", "Tender", tender.name)
-	return _("Tender {0} created. Add suppliers on the Tender and Save, then Complete Tender and send the RFQ from this request.").format(
+	return _("Tender {0} created. Add suppliers on the Tender and Save, then Create and Send RFQ from this request.").format(
 		tender.name
 	)
 

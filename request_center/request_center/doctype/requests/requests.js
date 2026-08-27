@@ -469,31 +469,6 @@ function run_material_workflow_step(frm, step) {
         return;
     }
 
-    if (step.prompt === "tender") {
-        frappe.prompt(
-            [
-                {
-                    fieldname: "tender_reference",
-                    fieldtype: "Data",
-                    label: __("Tender Reference"),
-                    default: frm.doc.tender_reference || "",
-                },
-                {
-                    fieldname: "tender_notes",
-                    fieldtype: "Small Text",
-                    label: __("Tender Notes"),
-                    default: frm.doc.tender_notes || "",
-                },
-            ],
-            function (values) {
-                go(values);
-            },
-            __("Tender"),
-            __("Complete Tender")
-        );
-        return;
-    }
-
     if (step.prompt === "comparison") {
         prompt_supplier_comparison(frm, step, go);
         return;
